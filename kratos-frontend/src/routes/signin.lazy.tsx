@@ -9,12 +9,23 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { useForm } from "@tanstack/react-form";
 
 export const Route = createLazyFileRoute("/signin")({
   component: () => <LoginForm />,
 });
 
 function LoginForm() {
+  const form = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    onSubmit: async ({ value }) => {
+      // Do something with form data
+      console.log(value);
+    },
+  });
   return (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
@@ -24,35 +35,65 @@ function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="m@example.com"
-              required
-            />
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center">
-              <Label htmlFor="password">Password</Label>
-              <a href="#" className="ml-auto inline-block text-sm underline">
-                Forgot your password?
-              </a>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+        >
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <form.Field
+                name="email"
+                children={(field) => (
+                  <>
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="m@example.com"
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+                  </>
+                )}
+              />
             </div>
-            <Input id="password" type="password" required />
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="password">Password</Label>
+                <a href="#" className="ml-auto inline-block text-sm underline">
+                  Forgot your password?
+                </a>
+              </div>
+              <form.Field
+                name="password"
+                children={(field) => (
+                  <Input
+                    id="password"
+                    type="password"
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                )}
+              />
+            </div>
+            <Button type="submit" className="w-full">
+              Login
+            </Button>
           </div>
-          <Button type="submit" className="w-full">
-            Login
-          </Button>
-        </div>
-        <div className="mt-4 text-center text-sm">
-          Don't have an account?{" "}
-          <Link to="/signup" className="underline">
-            Sign up
-          </Link>
-        </div>
+          <div className="mt-4 text-center text-sm">
+            Don't have an account?{" "}
+            <Link to="/signup" className="underline">
+              Sign up
+            </Link>
+          </div>
+        </form>
       </CardContent>
     </Card>
   );
