@@ -1,0 +1,80 @@
+version: "3.7"
+services:
+  kratos-migrate:
+    image: oryd/kratos:v1.2.0
+    environment:
+      - DSN=postgres://kratos:secret@postgresd:5432/kratos?sslmode=disable&max_conns=20&max_idle_conns=4
+      # - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true
+    volumes:
+      # - type: volume
+      #   source: kratos-sqlite
+      #   target: /var/lib/sqlite
+      #   read_only: false
+      - type: bind
+        source: ./config
+        target: /etc/config/kratos
+    command: -c /etc/config/kratos/kratos.yml migrate sql -e --yes
+    restart: on-failure
+    networks:
+      - intranet
+  postgresd:
+    image: postgres:16.4
+    ports:
+      - "5532:5432"
+    environment:
+      - POSTGRES_USER=kratos
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=kratos
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - intranet
+  kratos-selfservice-ui-node: #Kratos UI: sign up, sign in, logout, etc
+    image: oryd/kratos-selfservice-ui-node:v1.2.0
+    ports:
+      - "4455:4455"
+    environment:
+      - KRATOS_PUBLIC_URL=http://kratos:4433/
+      - KRATOS_BROWSER_URL=http://127.0.0.1:4433/
+      - PORT=4455
+      - COOKIE_SECRET=SuperSecretCookie # not included in quick-start.yml
+      - CSRF_COOKIE_NAME=__OryKratosApp # not included in quick-start.yml
+      - CSRF_COOKIE_SECRET=SuperSecretCookieCsrf # not included in quick-start.yml
+    networks:
+      - intranet
+    restart: on-failure
+  kratos:
+    depends_on:
+      - kratos-migrate
+    image: oryd/kratos:v1.2.0
+    ports:
+      - "4433:4433" # public
+      - "4434:4434" # admin
+    restart: unless-stopped
+    environment:
+      - DSN=postgres://kratos:secret@postgresd:5432/kratos?sslmode=disable&max_conns=20&max_idle_conns=4
+      # - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true
+    command: serve -c /etc/config/kratos/kratos.yml --dev --watch-courier
+    volumes:
+      # - type: volume
+      #   source: kratos-sqlite
+      #   target: /var/lib/sqlite
+      #   read_only: false
+      - type: bind
+        source: ./config
+        target: /etc/config/kratos
+    networks:
+      - intranet
+  mailslurper:
+    image: oryd/mailslurper:latest-smtps
+    ports:
+      - "4436:4436"
+      - "4437:4437"
+    networks:
+      - intranet
+
+networks:
+  intranet:
+volumes:
+  pgdata:
+  # kratos-sqlite:
