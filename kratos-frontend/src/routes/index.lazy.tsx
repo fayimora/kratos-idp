@@ -3,7 +3,7 @@ import { createLazyFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
 export const Route = createLazyFileRoute("/")({
-  component: () => Index(),
+  component: () => <Index />,
 });
 
 function Index() {
