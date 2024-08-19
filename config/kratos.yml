@@ -34,7 +34,7 @@ selfservice:
     error:
       ui_url: http://127.0.0.1:5173/
     settings:
-      ui_url: http://127.0.0.1:5173/settings
+      ui_url: http://127.0.0.1:5173/profile
   methods:
     password:
       enabled: true

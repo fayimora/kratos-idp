@@ -48,6 +48,9 @@ function Root() {
         <Link to="/register" className="[&.active]:font-bold">
           Sign Up
         </Link>
+        <Link to="/profile" className="[&.active]:font-bold">
+          Profile
+        </Link>
       </div>
 
       <hr />
