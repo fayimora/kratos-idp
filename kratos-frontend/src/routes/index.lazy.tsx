@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { createLazyFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { kratos } from "@/lib/utils";
+import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { Session } from "@ory/client";
 
 export const Route = createLazyFileRoute("/")({
   component: () => <Index />,
@@ -8,6 +10,24 @@ export const Route = createLazyFileRoute("/")({
 
 function Index() {
   const [count, setCount] = useState(0);
+  const [session, setSession] = useState<Session | null>(null);
+
+  const navigate = useNavigate();
+
+  const getSession = async () => {
+    try {
+      const { data: session } = await kratos.toSession();
+      console.log("session", session);
+      setSession(session);
+    } catch (error) {
+      console.error(error);
+      navigate({ to: "/login" });
+    }
+  };
+
+  useEffect(() => {
+    getSession();
+  }, []);
 
   return (
     <>

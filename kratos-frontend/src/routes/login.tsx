@@ -11,13 +11,12 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
 import {
-  Configuration,
-  FrontendApi,
   LoginFlow,
   UpdateLoginFlowBody,
   UiNodeInputAttributes,
 } from "@ory/client";
 import { useCallback, useEffect, useState } from "react";
+import { kratos } from "@/lib/utils";
 
 type LoginSearchParams = {
   flow?: string;
@@ -31,15 +30,6 @@ export const Route = createFileRoute("/login")({
     };
   },
 });
-
-const kratos = new FrontendApi(
-  new Configuration({
-    basePath: import.meta.env.VITE_KRATOS_BASE_URL,
-    baseOptions: {
-      withCredentials: true, // we need to include cookies
-    },
-  }),
-);
 
 function LoginForm() {
   const [loginFlow, setLoginFlow] = useState<LoginFlow>();
