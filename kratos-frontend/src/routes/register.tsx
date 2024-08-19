@@ -50,6 +50,10 @@ function SignUpForm() {
         password: value.password,
         traits: {
           email: value.email,
+          name: {
+            first: value.firstName,
+            last: value.lastName,
+          },
         },
       };
 
