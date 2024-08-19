@@ -16,11 +16,11 @@ import {
   UiNodeInputAttributes,
 } from "@ory/client";
 import { useCallback, useEffect, useState } from "react";
-import { kratos, LoginSearchParams } from "@/lib/utils";
+import { kratos, KratosFlowSearchParams } from "@/lib/utils";
 
 export const Route = createFileRoute("/login")({
   component: () => <LoginForm />,
-  validateSearch: (search: Record<string, unknown>): LoginSearchParams => {
+  validateSearch: (search: Record<string, unknown>): KratosFlowSearchParams => {
     return {
       flow: (search.flow as string) || "",
     };
@@ -111,6 +111,8 @@ function LoginForm() {
   };
 
   useEffect(() => {
+    kratos.toSession().then(() => navigate({ to: "/" }));
+
     // check if the login flow is for two factor authentication
     // const aal2 = searchParams.get("aal2");
     // we can redirect the user back to the page they were on before login
