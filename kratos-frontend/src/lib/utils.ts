@@ -1,6 +1,11 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Configuration, FrontendApi } from "@ory/client";
+import {
+  Configuration,
+  FrontendApi,
+  UiNode,
+  UiNodeInputAttributes,
+} from "@ory/client";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -18,5 +23,12 @@ export const kratos = new FrontendApi(
 export type KratosFlowSearchParams = {
   flow?: string;
   verifiable_address?: string;
-  code?: string;
 };
+
+export function getInputAttributeValue(nodes: UiNode[], name: string) {
+  const inputNodes = nodes.filter((n) => n.type === "input");
+  const nodeAttributes = inputNodes?.find(
+    (n) => (n.attributes as UiNodeInputAttributes).name === name,
+  )?.attributes as UiNodeInputAttributes;
+  return nodeAttributes.value as string;
+}

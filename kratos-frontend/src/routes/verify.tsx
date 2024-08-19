@@ -16,20 +16,24 @@ import {
   UiNodeInputAttributes,
 } from "@ory/client";
 import { useCallback, useEffect, useState } from "react";
-import { kratos, KratosFlowSearchParams } from "@/lib/utils";
+import {
+  getInputAttributeValue,
+  kratos,
+  KratosFlowSearchParams,
+} from "@/lib/utils";
 
 export const Route = createFileRoute("/verify")({
   component: () => <VerifyForm />,
   validateSearch: (search: Record<string, unknown>): KratosFlowSearchParams => {
     return {
       flow: (search.flow as string) || "",
-      code: (search.code as string) || "",
     };
   },
 });
 
 function VerifyForm() {
   const [flow, setFlow] = useState<VerificationFlow | null>(null);
+  const [code, setCode] = useState<string>("");
 
   const navigate = useNavigate();
   const searchParams = Route.useSearch();
@@ -37,16 +41,10 @@ function VerifyForm() {
   const form = useForm({
     defaultValues: {
       email: searchParams.verifiable_address,
-      code: searchParams.code,
+      code: code,
     },
     onSubmit: async ({ value }) => {
-      const csrf_token = (
-        flow?.ui.nodes.find(
-          (n) =>
-            n.type === "input" &&
-            (n.attributes as UiNodeInputAttributes).name === "csrf_token",
-        )?.attributes as UiNodeInputAttributes
-      ).value as string;
+      const csrf_token = getInputAttributeValue(flow!.ui.nodes, "csrf_token");
 
       const verifyFlowBody: UpdateVerificationFlowBody = {
         code: value.code,
@@ -66,7 +64,12 @@ function VerifyForm() {
     try {
       const { data: flow } = await kratos.getVerificationFlow({ id: flowId });
       console.log("verificationFlow", flow);
-      return setFlow(flow);
+      setFlow(flow);
+      if (flow?.state === "sent_email") {
+        console.log("we sent email");
+        const code = getInputAttributeValue(flow!.ui.nodes, "code");
+        setCode(code);
+      }
     } catch (err) {
       console.error(err);
     }

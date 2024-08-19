@@ -11,12 +11,12 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
 import { useCallback, useEffect, useState } from "react";
+import { RegistrationFlow, UpdateRegistrationFlowBody } from "@ory/client";
 import {
-  RegistrationFlow,
-  UpdateRegistrationFlowBody,
-  UiNodeInputAttributes,
-} from "@ory/client";
-import { kratos, KratosFlowSearchParams } from "@/lib/utils";
+  getInputAttributeValue,
+  kratos,
+  KratosFlowSearchParams,
+} from "@/lib/utils";
 
 export const Route = createFileRoute("/register")({
   component: () => <SignUpForm />,
@@ -40,14 +40,10 @@ function SignUpForm() {
       password: "",
     },
     onSubmit: async ({ value }) => {
-      const csrf_token = (
-        registrationFlow?.ui.nodes.find(
-          (n) =>
-            n.type === "input" &&
-            (n.attributes as UiNodeInputAttributes).name === "csrf_token",
-        )?.attributes as UiNodeInputAttributes
-      ).value as string;
-
+      const csrf_token = getInputAttributeValue(
+        registrationFlow!.ui.nodes,
+        "csrf_token",
+      );
       const req: UpdateRegistrationFlowBody = {
         method: "password",
         csrf_token: csrf_token,

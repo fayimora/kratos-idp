@@ -10,13 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
-import {
-  LoginFlow,
-  UpdateLoginFlowBody,
-  UiNodeInputAttributes,
-} from "@ory/client";
+import { LoginFlow, UpdateLoginFlowBody } from "@ory/client";
 import { useCallback, useEffect, useState } from "react";
-import { kratos, KratosFlowSearchParams } from "@/lib/utils";
+import {
+  getInputAttributeValue,
+  kratos,
+  KratosFlowSearchParams,
+} from "@/lib/utils";
 
 export const Route = createFileRoute("/login")({
   component: () => <LoginForm />,
@@ -39,13 +39,10 @@ function LoginForm() {
       csrf_token: "",
     },
     onSubmit: async ({ value }) => {
-      const csrf_token = (
-        loginFlow?.ui.nodes.find(
-          (n) =>
-            n.type === "input" &&
-            (n.attributes as UiNodeInputAttributes).name === "csrf_token",
-        )?.attributes as UiNodeInputAttributes
-      ).value as string;
+      const csrf_token = getInputAttributeValue(
+        loginFlow!.ui.nodes,
+        "csrf_token",
+      );
 
       const loginFlowBody: UpdateLoginFlowBody = {
         csrf_token: csrf_token,
