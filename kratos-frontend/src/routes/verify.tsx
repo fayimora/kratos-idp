@@ -130,25 +130,27 @@ function VerifyForm() {
           }}
         >
           <div className="grid gap-4">
-            <div className="grid gap-2">
-              <form.Field
-                name="email"
-                children={(field) => (
-                  <>
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      disabled
-                      placeholder={field.state.value}
-                      name={field.name}
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    />
-                  </>
-                )}
-              />
-            </div>
+            {searchParams.verifiable_address ? (
+              <div className="grid gap-2">
+                <form.Field
+                  name="email"
+                  children={(field) => (
+                    <>
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        disabled
+                        placeholder={field.state.value}
+                        name={field.name}
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                      />
+                    </>
+                  )}
+                />
+              </div>
+            ) : null}
             <div className="grid gap-2">
               <form.Field
                 name="code"
