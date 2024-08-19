@@ -11,7 +11,11 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
 import { useCallback, useEffect, useState } from "react";
-import { RegistrationFlow } from "@ory/client";
+import {
+  RegistrationFlow,
+  UpdateRegistrationFlowBody,
+  UiNodeInputAttributes,
+} from "@ory/client";
 import { kratos, KratosFlowSearchParams } from "@/lib/utils";
 
 export const Route = createFileRoute("/register")({
@@ -36,6 +40,24 @@ function SignUpForm() {
       password: "",
     },
     onSubmit: async ({ value }) => {
+      const csrf_token = (
+        registrationFlow?.ui.nodes.find(
+          (n) =>
+            n.type === "input" &&
+            (n.attributes as UiNodeInputAttributes).name === "csrf_token",
+        )?.attributes as UiNodeInputAttributes
+      ).value as string;
+
+      const req: UpdateRegistrationFlowBody = {
+        method: "password",
+        csrf_token: csrf_token,
+        password: value.password,
+        traits: {
+          email: value.email,
+        },
+      };
+
+      await submitFlow(req);
       console.log(value);
     },
   });
@@ -62,6 +84,23 @@ function SignUpForm() {
       console.log("created flow", flow);
 
       navigate({ to: "/register", search: () => ({ flow: flow.id }) });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const submitFlow = async (body: UpdateRegistrationFlowBody) => {
+    console.log("submitFlow", body);
+    if (!registrationFlow) return navigate({ to: "/register", replace: true });
+
+    try {
+      await kratos.updateRegistrationFlow({
+        flow: registrationFlow.id,
+        updateRegistrationFlowBody: body,
+      });
+      console.log("flow updated");
+
+      navigate({ to: "/login", replace: true });
     } catch (error) {
       console.error(error);
     }

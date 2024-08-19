@@ -26,7 +26,7 @@ selfservice:
     verification:
       ui_url: http://127.0.0.1:5173/verify
       use: link
-      enabled: true
+      enabled: false
     recovery:
       ui_url: http://127.0.0.1:5173/recovery
       use: link
