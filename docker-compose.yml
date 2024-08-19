@@ -24,20 +24,6 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - intranet
-  kratos-selfservice-ui-node: #Kratos UI: sign up, sign in, logout, etc
-    image: oryd/kratos-selfservice-ui-node:v1.2.0
-    ports:
-      - "4455:4455"
-    environment:
-      - KRATOS_PUBLIC_URL=http://kratos:4433/
-      - KRATOS_BROWSER_URL=http://127.0.0.1:4433/
-      - PORT=4455
-      - COOKIE_SECRET=SuperSecretCookie # not included in quick-start.yml
-      - CSRF_COOKIE_NAME=__OryKratosApp # not included in quick-start.yml
-      - CSRF_COOKIE_SECRET=SuperSecretCookieCsrf # not included in quick-start.yml
-    networks:
-      - intranet
-    restart: on-failure
   kratos:
     depends_on:
       - kratos-migrate
