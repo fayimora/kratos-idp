@@ -13,24 +13,24 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as LoginImport } from './routes/login'
 
 // Create Virtual Routes
 
-const SignupLazyImport = createFileRoute('/signup')()
-const SigninLazyImport = createFileRoute('/signin')()
+const RegisterLazyImport = createFileRoute('/register')()
 const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
 
-const SignupLazyRoute = SignupLazyImport.update({
-  path: '/signup',
+const RegisterLazyRoute = RegisterLazyImport.update({
+  path: '/register',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/signup.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/register.lazy').then((d) => d.Route))
 
-const SigninLazyRoute = SigninLazyImport.update({
-  path: '/signin',
+const LoginRoute = LoginImport.update({
+  path: '/login',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/signin.lazy').then((d) => d.Route))
+} as any)
 
 const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
@@ -48,18 +48,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexLazyImport
       parentRoute: typeof rootRoute
     }
-    '/signin': {
-      id: '/signin'
-      path: '/signin'
-      fullPath: '/signin'
-      preLoaderRoute: typeof SigninLazyImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
     }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupLazyImport
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterLazyImport
       parentRoute: typeof rootRoute
     }
   }
@@ -69,8 +69,8 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexLazyRoute,
-  SigninLazyRoute,
-  SignupLazyRoute,
+  LoginRoute,
+  RegisterLazyRoute,
 })
 
 /* prettier-ignore-end */
@@ -82,18 +82,18 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/signin",
-        "/signup"
+        "/login",
+        "/register"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
     },
-    "/signin": {
-      "filePath": "signin.lazy.tsx"
+    "/login": {
+      "filePath": "login.tsx"
     },
-    "/signup": {
-      "filePath": "signup.lazy.tsx"
+    "/register": {
+      "filePath": "register.lazy.tsx"
     }
   }
 }

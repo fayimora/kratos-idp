@@ -1,4 +1,4 @@
-import { createLazyFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Card,
   CardContent,
@@ -10,23 +10,93 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
+import { Configuration, FrontendApi, LoginFlow } from "@ory/client";
+import { useCallback, useEffect, useState } from "react";
 
-export const Route = createLazyFileRoute("/signin")({
+type LoginSearchParams = {
+  flow?: string;
+};
+
+export const Route = createFileRoute("/login")({
   component: () => <LoginForm />,
+  validateSearch: (search: Record<string, unknown>): LoginSearchParams => {
+    return {
+      flow: (search.flow as string) || "",
+    };
+  },
 });
 
+const kratos = new FrontendApi(
+  new Configuration({
+    basePath: import.meta.env.VITE_KRATOS_BASE_URL,
+    baseOptions: {
+      withCredentials: true, // we need to include cookies
+    },
+  }),
+);
+
 function LoginForm() {
+  const [loginFlow, setLoginFlow] = useState<LoginFlow>();
+  const searchParams = Route.useSearch();
+  const navigate = useNavigate();
+
   const form = useForm({
     defaultValues: {
       email: "",
       password: "",
     },
     onSubmit: async ({ value }) => {
-      // Do something with form data
       console.log(value);
     },
   });
-  return (
+
+  // Get the flow based on the flowId in the URL (.e.g redirect to this page after flow initialized)
+  const getFlow = useCallback(async (flowId: string) => {
+    console.log("getFlow");
+
+    // the flow data contains the form fields, error messages and csrf token
+    try {
+      const { data: flow } = await kratos.getLoginFlow({ id: flowId });
+      return setLoginFlow(flow);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  const createFlow = async () => {
+    console.log("createFlow");
+
+    try {
+      const { data: flow } = await kratos.createBrowserLoginFlow({
+        // returnTo: "/", // redirect to the root path after login
+        // if the user has a session, refresh it
+        refresh: true,
+        // if the aal2 query parameter is set, we get the two factor login flow UI nodes
+        aal: "aal1", //aal2 ? "aal2" : "aal1",
+      });
+
+      setLoginFlow(flow);
+      console.log("flow", flow);
+
+      navigate({ to: "/login", search: () => ({ flow: flow.id }) });
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    // check if the login flow is for two factor authentication
+    // const aal2 = searchParams.get("aal2");
+    // we can redirect the user back to the page they were on before login
+    // const returnTo = undefined; //searchParams.get("return_to");
+
+    const flowId = searchParams.flow;
+    if (flowId) {
+      getFlow(flowId).catch(() => createFlow()); // if for some reason the flow has expired, we need to get a new one
+      return;
+    }
+    createFlow();
+  }, []);
+
+  return loginFlow ? (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
         <CardTitle className="text-2xl">Sign In</CardTitle>
@@ -83,18 +153,22 @@ function LoginForm() {
                 )}
               />
             </div>
+            <Input type="hidden" name="csrf_token" />
+
             <Button type="submit" className="w-full">
               Login
             </Button>
           </div>
           <div className="mt-4 text-center text-sm">
             Don't have an account?{" "}
-            <Link to="/signup" className="underline">
+            <Link to="/register" className="underline">
               Sign up
             </Link>
           </div>
         </form>
       </CardContent>
     </Card>
+  ) : (
+    <h3>Loading...</h3>
   );
 }

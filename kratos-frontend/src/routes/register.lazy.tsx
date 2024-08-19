@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
 
-export const Route = createLazyFileRoute("/signup")({
+export const Route = createLazyFileRoute("/register")({
   component: () => <SignUpForm />,
 });
 
@@ -125,7 +125,7 @@ function SignUpForm() {
           </div>
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}
-            <Link to="/signin" className="underline">
+            <Link to="/login" className="underline">
               Sign in
             </Link>
           </div>
