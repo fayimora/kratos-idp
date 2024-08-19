@@ -11,10 +11,28 @@ serve:
     base_url: http://127.0.0.1:4434
 
 selfservice:
-  default_browser_return_url: http://127.0.0.1:4455/
-  allowed_return_urls:
-    - http://127.0.0.1:4455
-
+  default_browser_return_url: http://127.0.0.1:5173
+  flows:
+    logout:
+      after:
+        default_browser_return_url: http://127.0.0.1:5173
+    registration:
+      ui_url: http://127.0.0.1:5173/register
+      enabled: true
+    login:
+      ui_url: http://127.0.0.1:5173/login
+    verification:
+      ui_url: http://127.0.0.1:5173/verify
+      use: link
+      enabled: true
+    recovery:
+      ui_url: http://127.0.0.1:5173/recovery
+      use: link
+      enabled: true
+    error:
+      ui_url: http://127.0.0.1:5173/
+    settings:
+      ui_url: http://127.0.0.1:5173/settings
   methods:
     password:
       enabled: true
@@ -22,25 +40,40 @@ selfservice:
         min_password_length: 6
         identifier_similarity_check_enabled: false
         haveibeenpwned_enabled: false
+  allowed_return_urls:
+    - http://127.0.0.1:5173
 
-  flows:
-    error:
-      ui_url: http://127.0.0.1:4455/error
-    settings:
-      ui_url: http://127.0.0.1:4455/settings
-      privileged_session_max_age: 15m
-      required_aal: highest_available
-    logout:
-      after:
-        default_browser_return_url: http://127.0.0.1:4455/login
-    login:
-      ui_url: http://127.0.0.1:4455/login
-    registration:
-      ui_url: http://127.0.0.1:4455/registration
-      after:
-        password:
-          hooks:
-            - hook: session
+# selfservice:
+#   default_browser_return_url: http://127.0.0.1:4455/
+#   allowed_return_urls:
+#     - http://127.0.0.1:4455
+
+#   methods:
+#     password:
+#       enabled: true
+#       config:
+#         min_password_length: 6
+#         identifier_similarity_check_enabled: false
+#         haveibeenpwned_enabled: false
+
+#   flows:
+#     error:
+#       ui_url: http://127.0.0.1:4455/error
+#     settings:
+#       ui_url: http://127.0.0.1:4455/settings
+#       privileged_session_max_age: 15m
+#       required_aal: highest_available
+#     logout:
+#       after:
+#         default_browser_return_url: http://127.0.0.1:4455/login
+#     login:
+#       ui_url: http://127.0.0.1:4455/login
+#     registration:
+#       ui_url: http://127.0.0.1:4455/registration
+#       after:
+#         password:
+#           hooks:
+#             - hook: session
 
 log:
   format: text
