@@ -25,8 +25,8 @@ selfservice:
       ui_url: http://127.0.0.1:5173/login
     verification:
       ui_url: http://127.0.0.1:5173/verify
-      use: link
-      enabled: false
+      use: code
+      enabled: true
     recovery:
       ui_url: http://127.0.0.1:5173/recovery
       use: link

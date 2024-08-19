@@ -94,11 +94,26 @@ function SignUpForm() {
     if (!registrationFlow) return navigate({ to: "/register", replace: true });
 
     try {
-      await kratos.updateRegistrationFlow({
+      const { data: registration } = await kratos.updateRegistrationFlow({
         flow: registrationFlow.id,
         updateRegistrationFlowBody: body,
       });
       console.log("flow updated");
+
+      const verificationFlow = registration.continue_with.find(
+        (c) => c.action === "show_verification_ui",
+      ).flow;
+      console.log("verificationFlow", verificationFlow);
+
+      if (verificationFlow) {
+        return navigate({
+          to: "/verify",
+          search: () => ({
+            flow: verificationFlow.id,
+            verifiable_address: verificationFlow.verifiable_address,
+          }),
+        });
+      }
 
       navigate({ to: "/login", replace: true });
     } catch (error) {
