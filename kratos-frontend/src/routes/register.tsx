@@ -1,4 +1,4 @@
-import { createLazyFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Card,
   CardContent,
@@ -10,12 +10,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
+import { useCallback, useEffect, useState } from "react";
+import { RegistrationFlow } from "@ory/client";
+import { kratos, KratosFlowSearchParams } from "@/lib/utils";
 
-export const Route = createLazyFileRoute("/register")({
+export const Route = createFileRoute("/register")({
   component: () => <SignUpForm />,
+  validateSearch: (search: Record<string, unknown>): KratosFlowSearchParams => {
+    return {
+      flow: (search.flow as string) || "",
+    };
+  },
 });
 
 function SignUpForm() {
+  const [registrationFlow, setRegistrationFlow] = useState<RegistrationFlow>();
+  const searchParams = Route.useSearch();
+  const navigate = useNavigate();
+
   const form = useForm({
     defaultValues: {
       firstName: "",
@@ -27,6 +39,45 @@ function SignUpForm() {
       console.log(value);
     },
   });
+
+  const getFlow = useCallback(async (flowId: string) => {
+    console.log("getFlow", flowId);
+
+    // the flow data contains the form fields, error messages and csrf token
+    try {
+      const { data: flow } = await kratos.getRegistrationFlow({ id: flowId });
+      return setRegistrationFlow(flow);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  const createFlow = async () => {
+    console.log("createFlow");
+
+    try {
+      const { data: flow } = await kratos.createBrowserRegistrationFlow({});
+
+      setRegistrationFlow(flow);
+      console.log("created flow", flow);
+
+      navigate({ to: "/register", search: () => ({ flow: flow.id }) });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    // we cant create registration flow if there is a valid session. User must log out first
+    kratos.toSession().then(() => navigate({ to: "/" }));
+
+    const flowId = searchParams.flow;
+    if (flowId) {
+      getFlow(flowId).catch(() => createFlow()); // if for some reason the flow has expired, we need to get a new one
+      return;
+    }
+    createFlow();
+  }, []);
 
   return (
     <Card className="mx-auto max-w-sm">

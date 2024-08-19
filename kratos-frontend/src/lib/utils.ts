@@ -14,3 +14,7 @@ export const kratos = new FrontendApi(
     },
   }),
 );
+
+export type KratosFlowSearchParams = {
+  flow?: string;
+};

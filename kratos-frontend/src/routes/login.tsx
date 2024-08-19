@@ -16,11 +16,7 @@ import {
   UiNodeInputAttributes,
 } from "@ory/client";
 import { useCallback, useEffect, useState } from "react";
-import { kratos } from "@/lib/utils";
-
-type LoginSearchParams = {
-  flow?: string;
-};
+import { kratos, LoginSearchParams } from "@/lib/utils";
 
 export const Route = createFileRoute("/login")({
   component: () => <LoginForm />,
@@ -91,7 +87,9 @@ function LoginForm() {
       console.log("created flow", flow);
 
       navigate({ to: "/login", search: () => ({ flow: flow.id }) });
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   // submit the login form data to Ory
