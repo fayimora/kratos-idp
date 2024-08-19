@@ -10,7 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
-import { Configuration, FrontendApi, LoginFlow } from "@ory/client";
+import {
+  Configuration,
+  FrontendApi,
+  LoginFlow,
+  UpdateLoginFlowBody,
+  UiNodeInputAttributes,
+} from "@ory/client";
 import { useCallback, useEffect, useState } from "react";
 
 type LoginSearchParams = {
@@ -44,15 +50,31 @@ function LoginForm() {
     defaultValues: {
       email: "",
       password: "",
+      csrf_token: "",
     },
     onSubmit: async ({ value }) => {
-      console.log(value);
+      const csrf_token = (
+        loginFlow?.ui.nodes.find(
+          (n) =>
+            n.type === "input" &&
+            (n.attributes as UiNodeInputAttributes).name === "csrf_token",
+        )?.attributes as UiNodeInputAttributes
+      ).value as string;
+
+      const loginFlowBody: UpdateLoginFlowBody = {
+        csrf_token: csrf_token,
+        identifier: value.email,
+        method: "password",
+        password: value.password,
+      };
+      console.log(loginFlowBody);
+      await submitFlow(loginFlowBody);
     },
   });
 
   // Get the flow based on the flowId in the URL (.e.g redirect to this page after flow initialized)
   const getFlow = useCallback(async (flowId: string) => {
-    console.log("getFlow");
+    console.log("getFlow", flowId);
 
     // the flow data contains the form fields, error messages and csrf token
     try {
@@ -76,10 +98,28 @@ function LoginForm() {
       });
 
       setLoginFlow(flow);
-      console.log("flow", flow);
+      console.log("created flow", flow);
 
       navigate({ to: "/login", search: () => ({ flow: flow.id }) });
     } catch (error) {}
+  };
+
+  // submit the login form data to Ory
+  const submitFlow = async (body: UpdateLoginFlowBody) => {
+    console.log("submitFlow", body);
+    if (!loginFlow) return navigate({ to: "/login", replace: true });
+
+    try {
+      await kratos.updateLoginFlow({
+        flow: loginFlow.id,
+        updateLoginFlowBody: body,
+      });
+      console.log("flow updated");
+
+      navigate({ to: "/", replace: true });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -153,7 +193,16 @@ function LoginForm() {
                 )}
               />
             </div>
-            <Input type="hidden" name="csrf_token" />
+            <form.Field
+              name="csrf_token"
+              children={(field) => (
+                <Input
+                  type="hidden"
+                  name={field.name}
+                  value={field.state.value}
+                />
+              )}
+            />
 
             <Button type="submit" className="w-full">
               Login
