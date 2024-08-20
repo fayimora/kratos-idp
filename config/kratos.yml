@@ -23,6 +23,12 @@ selfservice:
       enabled: true
     login:
       ui_url: http://127.0.0.1:5173/login
+      lifespan: 1h
+      after:
+        default_browser_return_url: http://127.0.0.1:5173
+        password:
+          hooks:
+            - hook: require_verified_address
     verification:
       ui_url: http://127.0.0.1:5173/verify
       use: code
@@ -87,6 +93,16 @@ secrets:
     - CHANGE_ME_TO_REAL_SECRET
   cipher:
     - 32-LONG-SECRET-NOT-SECURE-AT-ALL
+
+hashers:
+  algorithm: bcrypt
+  bcrypt:
+    cost: 12
+
+session:
+  whoami:
+    required_aal: aal1
+  lifespan: 1h
 
 identity:
   default_schema_id: default
