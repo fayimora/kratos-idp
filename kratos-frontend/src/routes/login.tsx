@@ -1,9 +1,4 @@
-import {
-  createFileRoute,
-  Link,
-  redirect,
-  useNavigate,
-} from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import {
   Card,
   CardContent,
@@ -22,6 +17,7 @@ import {
   kratos,
   KratosFlowSearchParams,
 } from "@/lib/utils";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/login")({
   component: () => <LoginForm />,
@@ -35,7 +31,12 @@ export const Route = createFileRoute("/login")({
 function LoginForm() {
   const [loginFlow, setLoginFlow] = useState<LoginFlow>();
   const searchParams = Route.useSearch();
-  const navigate = useNavigate();
+  const navigate = Route.useNavigate();
+  const { session } = useAuth();
+
+  if (session?.active) {
+    navigate({ to: "/", replace: true });
+  }
 
   const form = useForm({
     defaultValues: {
@@ -45,7 +46,7 @@ function LoginForm() {
     },
     onSubmit: async ({ value }) => {
       const csrf_token = getInputAttributeValue(
-        loginFlow!.ui.nodes,
+        loginFlow?.ui.nodes,
         "csrf_token",
       );
 
@@ -105,16 +106,13 @@ function LoginForm() {
         updateLoginFlowBody: body,
       });
       console.log("flow updated");
-
-      navigate({ to: "/", replace: true });
+      navigate({ to: "/profile", replace: true });
     } catch (error) {
       console.error(error);
     }
   };
 
   useEffect(() => {
-    kratos.toSession().then(() => navigate({ to: "/" }));
-
     // check if the login flow is for two factor authentication
     // const aal2 = searchParams.get("aal2");
     // we can redirect the user back to the page they were on before login
@@ -122,7 +120,7 @@ function LoginForm() {
 
     const flowId = searchParams.flow;
     if (flowId) {
-      getFlow(flowId).catch(() => createFlow()); // if for some reason the flow has expired, we need to get a new one
+      getFlow(flowId).catch(() => createFlow());
       return;
     }
     createFlow();

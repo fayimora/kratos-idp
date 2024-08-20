@@ -11,12 +11,17 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
 import { useCallback, useEffect, useState } from "react";
-import { RegistrationFlow, UpdateRegistrationFlowBody } from "@ory/client";
+import {
+  RegistrationFlow,
+  SuccessfulNativeRegistration,
+  UpdateRegistrationFlowBody,
+} from "@ory/client";
 import {
   getInputAttributeValue,
   kratos,
   KratosFlowSearchParams,
 } from "@/lib/utils";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/register")({
   component: () => <SignUpForm />,
@@ -31,6 +36,11 @@ function SignUpForm() {
   const [registrationFlow, setRegistrationFlow] = useState<RegistrationFlow>();
   const searchParams = Route.useSearch();
   const navigate = useNavigate();
+  const { session } = useAuth();
+
+  if (session?.active) {
+    navigate({ to: "/", replace: true });
+  }
 
   const form = useForm({
     defaultValues: {
@@ -58,7 +68,6 @@ function SignUpForm() {
       };
 
       await submitFlow(req);
-      console.log(value);
     },
   });
 
@@ -75,7 +84,7 @@ function SignUpForm() {
   }, []);
 
   const createFlow = async () => {
-    console.log("createFlow");
+    console.log("create register Flow");
 
     try {
       const { data: flow } = await kratos.createBrowserRegistrationFlow({});
@@ -90,7 +99,7 @@ function SignUpForm() {
   };
 
   const submitFlow = async (body: UpdateRegistrationFlowBody) => {
-    console.log("submitFlow", body);
+    console.log("submit register Flow", body);
     if (!registrationFlow) return navigate({ to: "/register", replace: true });
 
     try {
@@ -98,8 +107,7 @@ function SignUpForm() {
         flow: registrationFlow.id,
         updateRegistrationFlowBody: body,
       });
-      console.log("flow updated");
-
+      console.log("flow updated", registration);
       const verificationFlow = registration.continue_with.find(
         (c) => c.action === "show_verification_ui",
       ).flow;
@@ -122,9 +130,6 @@ function SignUpForm() {
   };
 
   useEffect(() => {
-    // we cant create registration flow if there is a valid session. User must log out first
-    kratos.toSession().then(() => navigate({ to: "/" }));
-
     const flowId = searchParams.flow;
     if (flowId) {
       getFlow(flowId).catch(() => createFlow()); // if for some reason the flow has expired, we need to get a new one

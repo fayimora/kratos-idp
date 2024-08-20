@@ -14,6 +14,7 @@ import {
   VerificationFlow,
   UpdateVerificationFlowBody,
   UiNodeInputAttributes,
+  LoginFlowState,
 } from "@ory/client";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -65,7 +66,7 @@ function VerifyForm() {
       const { data: flow } = await kratos.getVerificationFlow({ id: flowId });
       console.log("verificationFlow", flow);
       setFlow(flow);
-      if (flow?.state === "sent_email") {
+      if (flow?.state === LoginFlowState.SentEmail) {
         console.log("we sent email");
         const code = getInputAttributeValue(flow!.ui.nodes, "code");
         setCode(code);
@@ -189,4 +190,3 @@ function VerifyForm() {
     </Card>
   );
 }
-

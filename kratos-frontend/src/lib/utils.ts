@@ -23,9 +23,14 @@ export const kratos = new FrontendApi(
 export type KratosFlowSearchParams = {
   flow?: string;
   verifiable_address?: string;
+  redirect?: string;
 };
 
-export function getInputAttributeValue(nodes: UiNode[], name: string) {
+export function getInputAttributeValue(
+  nodes: UiNode[] | undefined,
+  name: string,
+) {
+  if (!nodes) return "";
   const inputNodes = nodes.filter((n) => n.type === "input");
   const nodeAttributes = inputNodes?.find(
     (n) => (n.attributes as UiNodeInputAttributes).name === name,

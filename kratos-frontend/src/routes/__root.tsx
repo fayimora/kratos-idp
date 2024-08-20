@@ -1,10 +1,15 @@
 import { kratos } from "@/lib/utils";
-import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
+import {
+  createRootRouteWithContext,
+  Link,
+  Outlet,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { useEffect, useState } from "react";
 import { Session } from "@ory/client";
+import { AuthContext } from "@/lib/auth";
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<AuthContext>()({
   component: () => <Root />,
 });
 
@@ -36,7 +41,7 @@ function Root() {
           Home
         </Link>{" "}
         {session ? (
-          <Link to={logoutUrl} replace={true} className="[&.active]:font-bold">
+          <Link to={logoutUrl} replace={true}>
             {" "}
             Sign Out{" "}
           </Link>

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import {
   Card,
   CardContent,
@@ -11,14 +11,15 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
 import { useCallback, useEffect, useState } from "react";
-import { Session, UpdateSettingsFlowBody, SettingsFlow } from "@ory/client";
+import { UpdateSettingsFlowBody, SettingsFlow } from "@ory/client";
 import {
   getInputAttributeValue,
   kratos,
   KratosFlowSearchParams,
 } from "@/lib/utils";
+import { useAuth } from "@/lib/auth";
 
-export const Route = createFileRoute("/profile")({
+export const Route = createFileRoute("/_auth/profile")({
   component: () => <Profile />,
   validateSearch: (search: Record<string, unknown>): KratosFlowSearchParams => {
     return {
@@ -29,9 +30,9 @@ export const Route = createFileRoute("/profile")({
 
 function Profile() {
   const [flow, setFlow] = useState<SettingsFlow | null>(null);
-  const [session, setSession] = useState<Session>();
   const searchParams = Route.useSearch();
-  const navigate = useNavigate();
+  const navigate = Route.useNavigate();
+  const { session } = useAuth();
 
   const form = useForm({
     defaultValues: {
@@ -58,21 +59,6 @@ function Profile() {
       console.log(value);
     },
   });
-
-  const getSession = async () => {
-    try {
-      const { data: session } = await kratos.toSession();
-      console.log("session", session);
-      setSession(session);
-    } catch (error) {
-      console.error(error);
-      navigate({ to: "/login" });
-    }
-  };
-
-  useEffect(() => {
-    getSession();
-  }, []);
 
   const getFlow = useCallback(async (flowId: string) => {
     console.log("getFlow", flowId);
