@@ -6,8 +6,7 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { useEffect, useState } from "react";
-import { Session } from "@ory/client";
-import { AuthContext } from "@/lib/auth";
+import { AuthContext, useAuth } from "@/lib/auth";
 
 export const Route = createRootRouteWithContext<AuthContext>()({
   component: () => <Root />,
@@ -15,7 +14,7 @@ export const Route = createRootRouteWithContext<AuthContext>()({
 
 function Root() {
   const [logoutUrl, setLogoutUrl] = useState<string>();
-  const [session, setSession] = useState<Session | null>(null);
+  const { session } = useAuth();
 
   const createLogoutFlow = async () => {
     try {
@@ -28,11 +27,10 @@ function Root() {
   };
 
   useEffect(() => {
-    kratos.toSession().then(({ data: session }) => {
-      setSession(session);
+    if (session?.active) {
       createLogoutFlow();
-    });
-  }, []);
+    }
+  }, [session]);
 
   return (
     <>
