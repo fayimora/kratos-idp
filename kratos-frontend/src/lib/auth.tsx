@@ -15,9 +15,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
-    kratos.toSession().then(({ data: session }) => {
+    const fetchSession = async () => {
+      console.log("fetching session");
+      const { data: session } = await kratos.toSession();
+      console.log("session in auth", session);
       setSession(session);
-    });
+    };
+    fetchSession().catch(console.error);
   }, []);
 
   return (
@@ -33,7 +37,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 };
 
 export const useAuth = () => {
-  console.log("caling useAuth");
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");

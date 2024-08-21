@@ -4,11 +4,16 @@ export const Route = createFileRoute("/_auth")({
   beforeLoad: ({ context, location }) => {
     console.log("auth index context", context);
     if (!context.session?.active) {
+      console.log("redirecting to login");
       throw redirect({
         to: "/login",
       });
     }
-    return context.session;
+    return context;
   },
-  component: () => <Outlet />,
+  component: () => <AuthLayout />,
 });
+
+function AuthLayout() {
+  return <Outlet />;
+}
