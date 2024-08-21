@@ -15,7 +15,7 @@ import { Route as VerifyImport } from './routes/verify'
 import { Route as RegisterImport } from './routes/register'
 import { Route as LoginImport } from './routes/login'
 import { Route as AuthImport } from './routes/_auth'
-import { Route as AuthIndexImport } from './routes/_auth/index'
+import { Route as IndexImport } from './routes/index'
 import { Route as AuthProfileImport } from './routes/_auth/profile'
 
 // Create/Update Routes
@@ -40,9 +40,9 @@ const AuthRoute = AuthImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AuthIndexRoute = AuthIndexImport.update({
+const IndexRoute = IndexImport.update({
   path: '/',
-  getParentRoute: () => AuthRoute,
+  getParentRoute: () => rootRoute,
 } as any)
 
 const AuthProfileRoute = AuthProfileImport.update({
@@ -54,6 +54,13 @@ const AuthProfileRoute = AuthProfileImport.update({
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
     '/_auth': {
       id: '/_auth'
       path: ''
@@ -89,20 +96,14 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthProfileImport
       parentRoute: typeof AuthImport
     }
-    '/_auth/': {
-      id: '/_auth/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AuthIndexImport
-      parentRoute: typeof AuthImport
-    }
   }
 }
 
 // Create and export the route tree
 
 export const routeTree = rootRoute.addChildren({
-  AuthRoute: AuthRoute.addChildren({ AuthProfileRoute, AuthIndexRoute }),
+  IndexRoute,
+  AuthRoute: AuthRoute.addChildren({ AuthProfileRoute }),
   LoginRoute,
   RegisterRoute,
   VerifyRoute,
@@ -116,17 +117,20 @@ export const routeTree = rootRoute.addChildren({
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
+        "/",
         "/_auth",
         "/login",
         "/register",
         "/verify"
       ]
     },
+    "/": {
+      "filePath": "index.tsx"
+    },
     "/_auth": {
       "filePath": "_auth.tsx",
       "children": [
-        "/_auth/profile",
-        "/_auth/"
+        "/_auth/profile"
       ]
     },
     "/login": {
@@ -140,10 +144,6 @@ export const routeTree = rootRoute.addChildren({
     },
     "/_auth/profile": {
       "filePath": "_auth/profile.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/": {
-      "filePath": "_auth/index.tsx",
       "parent": "/_auth"
     }
   }
