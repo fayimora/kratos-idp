@@ -14,9 +14,9 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as VerifyImport } from './routes/verify'
 import { Route as RegisterImport } from './routes/register'
 import { Route as LoginImport } from './routes/login'
-import { Route as AuthImport } from './routes/_auth'
+import { Route as SecuredImport } from './routes/_secured'
 import { Route as IndexImport } from './routes/index'
-import { Route as AuthProfileImport } from './routes/_auth/profile'
+import { Route as SecuredProfileImport } from './routes/_secured/profile'
 
 // Create/Update Routes
 
@@ -35,8 +35,8 @@ const LoginRoute = LoginImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AuthRoute = AuthImport.update({
-  id: '/_auth',
+const SecuredRoute = SecuredImport.update({
+  id: '/_secured',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -45,9 +45,9 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AuthProfileRoute = AuthProfileImport.update({
+const SecuredProfileRoute = SecuredProfileImport.update({
   path: '/profile',
-  getParentRoute: () => AuthRoute,
+  getParentRoute: () => SecuredRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -61,11 +61,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/_auth': {
-      id: '/_auth'
+    '/_secured': {
+      id: '/_secured'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof AuthImport
+      preLoaderRoute: typeof SecuredImport
       parentRoute: typeof rootRoute
     }
     '/login': {
@@ -89,12 +89,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerifyImport
       parentRoute: typeof rootRoute
     }
-    '/_auth/profile': {
-      id: '/_auth/profile'
+    '/_secured/profile': {
+      id: '/_secured/profile'
       path: '/profile'
       fullPath: '/profile'
-      preLoaderRoute: typeof AuthProfileImport
-      parentRoute: typeof AuthImport
+      preLoaderRoute: typeof SecuredProfileImport
+      parentRoute: typeof SecuredImport
     }
   }
 }
@@ -103,7 +103,7 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexRoute,
-  AuthRoute: AuthRoute.addChildren({ AuthProfileRoute }),
+  SecuredRoute: SecuredRoute.addChildren({ SecuredProfileRoute }),
   LoginRoute,
   RegisterRoute,
   VerifyRoute,
@@ -118,7 +118,7 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/_auth",
+        "/_secured",
         "/login",
         "/register",
         "/verify"
@@ -127,10 +127,10 @@ export const routeTree = rootRoute.addChildren({
     "/": {
       "filePath": "index.tsx"
     },
-    "/_auth": {
-      "filePath": "_auth.tsx",
+    "/_secured": {
+      "filePath": "_secured.tsx",
       "children": [
-        "/_auth/profile"
+        "/_secured/profile"
       ]
     },
     "/login": {
@@ -142,9 +142,9 @@ export const routeTree = rootRoute.addChildren({
     "/verify": {
       "filePath": "verify.tsx"
     },
-    "/_auth/profile": {
-      "filePath": "_auth/profile.tsx",
-      "parent": "/_auth"
+    "/_secured/profile": {
+      "filePath": "_secured/profile.tsx",
+      "parent": "/_secured"
     }
   }
 }

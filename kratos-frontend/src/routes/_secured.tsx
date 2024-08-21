@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_auth")({
+export const Route = createFileRoute("/_secured")({
   beforeLoad: ({ context, location }) => {
     console.log("auth index context", context);
     if (!context.session?.active) {

@@ -21,7 +21,7 @@ import { useAuth } from "@/lib/auth";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
-export const Route = createFileRoute("/_auth/profile")({
+export const Route = createFileRoute("/_secured/profile")({
   component: () => <Profile />,
   validateSearch: (search: Record<string, unknown>): KratosFlowSearchParams => {
     return {
