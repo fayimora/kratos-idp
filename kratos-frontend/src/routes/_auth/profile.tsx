@@ -18,6 +18,8 @@ import {
   KratosFlowSearchParams,
 } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export const Route = createFileRoute("/_auth/profile")({
   component: () => <Profile />,
@@ -30,6 +32,7 @@ export const Route = createFileRoute("/_auth/profile")({
 
 function Profile() {
   const [flow, setFlow] = useState<SettingsFlow | null>(null);
+  const [settings, setSettings] = useState<SettingsFlow | null>(null);
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
   const { session } = useAuth();
@@ -91,10 +94,12 @@ function Profile() {
     console.log("submitFlow", body);
     if (!flow) return navigate({ replace: true });
     try {
-      await kratos.updateSettingsFlow({
+      const { data: settings } = await kratos.updateSettingsFlow({
         flow: flow.id,
         updateSettingsFlowBody: body,
       });
+      setSettings(settings);
+
       console.log("flow updated");
 
       navigate({ replace: true });
@@ -117,6 +122,13 @@ function Profile() {
       <CardHeader>
         <CardTitle className="text-xl">Profile</CardTitle>
         <CardDescription>Update your profile information</CardDescription>
+        {settings?.ui.messages?.map((m) => (
+          <Alert variant="default" key={m.id}>
+            <AlertCircle className="h-4 w-4" />
+            {/* <AlertTitle>Error</AlertTitle> */}
+            <AlertDescription>{m.text}</AlertDescription>
+          </Alert>
+        ))}
       </CardHeader>
       <CardContent>
         <form
