@@ -1,4 +1,4 @@
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   Card,
   CardContent,
@@ -81,7 +81,7 @@ function Profile() {
       setFlow(flow);
       console.log("created flow", flow);
 
-      navigate({ search: () => ({ flow: flow.id }) });
+      navigate({ to: "/profile", search: () => ({ flow: flow.id }) });
     } catch (error) {
       console.error(error);
     }
@@ -105,7 +105,7 @@ function Profile() {
 
   useEffect(() => {
     const flowId = searchParams.flow;
-    if (flowId) {
+    if (flowId && flowId !== "") {
       getFlow(flowId).catch(() => createFlow()); // if for some reason the flow has expired, we need to get a new one
       return;
     }

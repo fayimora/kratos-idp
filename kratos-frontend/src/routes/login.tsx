@@ -1,4 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useRouter,
+} from "@tanstack/react-router";
 import {
   Card,
   CardContent,
@@ -26,17 +31,23 @@ export const Route = createFileRoute("/login")({
       flow: (search.flow as string) || "",
     };
   },
+  beforeLoad: ({ context, location }) => {
+    console.log("login before load", context);
+    if (context.session?.active) {
+      throw redirect({
+        to: "/profile",
+        replace: true,
+      });
+    }
+  },
 });
 
 function LoginForm() {
   const [loginFlow, setLoginFlow] = useState<LoginFlow>();
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
-  const { session } = useAuth();
-
-  if (session?.active) {
-    navigate({ to: "/", replace: true });
-  }
+  const router = useRouter();
+  const { login } = useAuth();
 
   const form = useForm({
     defaultValues: {
@@ -56,8 +67,8 @@ function LoginForm() {
         method: "password",
         password: value.password,
       };
-      console.log(loginFlowBody);
-      await submitFlow(loginFlowBody);
+      await login(loginFlow!.id, loginFlowBody);
+      router.invalidate();
     },
   });
 
@@ -96,21 +107,24 @@ function LoginForm() {
   };
 
   // submit the login form data to Ory
-  const submitFlow = async (body: UpdateLoginFlowBody) => {
-    console.log("submitFlow", body);
-    if (!loginFlow) return navigate({ to: "/login", replace: true });
+  // const submitFlow = async (body: UpdateLoginFlowBody) => {
+  //   console.log("submitFlow", body);
+  //   if (!loginFlow) return navigate({ to: "/login", replace: true });
 
-    try {
-      await kratos.updateLoginFlow({
-        flow: loginFlow.id,
-        updateLoginFlowBody: body,
-      });
-      console.log("flow updated");
-      navigate({ to: "/profile", replace: true });
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  //   try {
+  //     await kratos.updateLoginFlow({
+  //       flow: loginFlow.id,
+  //       updateLoginFlowBody: body,
+  //     });
+  //     console.log("flow updated");
+
+  //     await router.invalidate();
+
+  //     navigate({ to: "/profile", replace: true });
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   useEffect(() => {
     // check if the login flow is for two factor authentication

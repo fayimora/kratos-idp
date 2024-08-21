@@ -5,12 +5,14 @@ import { routeTree } from "./routeTree.gen";
 import ReactDOM from "react-dom/client";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { AuthProvider, useAuth } from "./lib/auth";
+import { UpdateLoginFlowBody } from "@ory/client";
 
 const router = createRouter({
   routeTree,
   context: {
     session: undefined!,
     client: undefined!,
+    isAuthenticated: false,
   },
   // defaultPreload: "intent"
 });
@@ -39,6 +41,7 @@ function InnerApp() {
       context={{
         session: auth.session,
         client: auth.client,
+        isAuthenticated: false,
       }}
     />
   );
