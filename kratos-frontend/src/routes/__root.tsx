@@ -54,6 +54,9 @@ function Root() {
         <Link to="/profile" className="[&.active]:font-bold">
           Profile
         </Link>
+        <Link to="/recovery" className="[&.active]:font-bold">
+          Recovery
+        </Link>
       </div>
 
       <hr />

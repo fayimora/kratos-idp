@@ -35,13 +35,22 @@ selfservice:
       enabled: true
     recovery:
       ui_url: http://127.0.0.1:5173/recovery
-      use: link
+      use: code
+      lifespan: 15m
+      notify_unknown_recipients: true
       enabled: true
+      after:
+        hooks:
+          - hook: revoke_active_sessions
     error:
       ui_url: http://127.0.0.1:5173/
     settings:
       ui_url: http://127.0.0.1:5173/profile
   methods:
+    code:
+      enabled: true
+      config:
+        lifespan: 15m
     password:
       enabled: true
       config:

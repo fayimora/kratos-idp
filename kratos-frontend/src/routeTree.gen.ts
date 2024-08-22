@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as VerifyImport } from './routes/verify'
 import { Route as RegisterImport } from './routes/register'
+import { Route as RecoveryImport } from './routes/recovery'
 import { Route as LoginImport } from './routes/login'
 import { Route as SecuredImport } from './routes/_secured'
 import { Route as IndexImport } from './routes/index'
@@ -27,6 +28,11 @@ const VerifyRoute = VerifyImport.update({
 
 const RegisterRoute = RegisterImport.update({
   path: '/register',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const RecoveryRoute = RecoveryImport.update({
+  path: '/recovery',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -75,6 +81,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
     }
+    '/recovery': {
+      id: '/recovery'
+      path: '/recovery'
+      fullPath: '/recovery'
+      preLoaderRoute: typeof RecoveryImport
+      parentRoute: typeof rootRoute
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -105,6 +118,7 @@ export const routeTree = rootRoute.addChildren({
   IndexRoute,
   SecuredRoute: SecuredRoute.addChildren({ SecuredProfileRoute }),
   LoginRoute,
+  RecoveryRoute,
   RegisterRoute,
   VerifyRoute,
 })
@@ -120,6 +134,7 @@ export const routeTree = rootRoute.addChildren({
         "/",
         "/_secured",
         "/login",
+        "/recovery",
         "/register",
         "/verify"
       ]
@@ -135,6 +150,9 @@ export const routeTree = rootRoute.addChildren({
     },
     "/login": {
       "filePath": "login.tsx"
+    },
+    "/recovery": {
+      "filePath": "recovery.tsx"
     },
     "/register": {
       "filePath": "register.tsx"
