@@ -69,7 +69,7 @@ function Profile() {
     // the flow data contains the form fields, error messages and csrf token
     try {
       const { data: flow } = await kratos.getSettingsFlow({ id: flowId });
-      return setFlow(flow);
+      setFlow(flow);
     } catch (err) {
       console.error(err);
     }

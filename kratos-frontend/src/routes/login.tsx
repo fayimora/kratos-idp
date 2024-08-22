@@ -68,7 +68,7 @@ function LoginForm() {
         password: value.password,
       };
       await login(loginFlow!.id, loginFlowBody);
-      router.invalidate();
+      setTimeout(() => router.invalidate(), 1000);
     },
   });
 
