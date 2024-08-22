@@ -17,7 +17,6 @@ import {
   kratos,
   KratosFlowSearchParams,
 } from "@/lib/utils";
-import { useAuth } from "@/lib/auth";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
@@ -35,14 +34,12 @@ function Profile() {
   const [settings, setSettings] = useState<SettingsFlow | null>(null);
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
-  const { session } = useAuth();
 
   const form = useForm({
     defaultValues: {
-      firstName: session?.identity?.traits?.name?.first || "",
-      lastName: session?.identity?.traits?.name?.last || "",
-      email: session?.identity?.traits?.email || "",
-      // password: "",
+      firstName: flow?.identity.traits.name.first || "",
+      lastName: flow?.identity.traits.name.last || "",
+      email: flow?.identity.traits.email || "",
     },
     onSubmit: async ({ value }) => {
       const csrf_token = getInputAttributeValue(flow!.ui.nodes, "csrf_token");
@@ -195,24 +192,6 @@ function Profile() {
                 )}
               />
             </div>
-            {/* <div className="grid gap-2"> */}
-            {/*   <form.Field */}
-            {/*     name="password" */}
-            {/*     children={(field) => ( */}
-            {/*       <> */}
-            {/*         <Label htmlFor="password">Password</Label> */}
-            {/*         <Input */}
-            {/*           id="password" */}
-            {/*           type="password" */}
-            {/*           name={field.name} */}
-            {/*           value={field.state.value} */}
-            {/*           onBlur={field.handleBlur} */}
-            {/*           onChange={(e) => field.handleChange(e.target.value)} */}
-            {/*         /> */}
-            {/*       </> */}
-            {/*     )} */}
-            {/*   /> */}
-            {/* </div> */}
             <Button type="submit" className="w-full">
               Update
             </Button>
