@@ -19,13 +19,13 @@ import { LoginFlow, UpdateLoginFlowBody } from "@ory/client";
 import { useCallback, useEffect, useState } from "react";
 import {
   getInputAttributeValue,
+  getRouteLogger,
   kratos,
   KratosFlowSearchParams,
 } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
-import { getLogger } from "@logtape/logtape";
 
-const logger = getLogger(["kratos-idp-frontend", "auth"]);
+const logger = getRouteLogger("login");
 
 export const Route = createFileRoute("/login")({
   component: () => <LoginForm />,
@@ -82,14 +82,15 @@ function LoginForm() {
     // the flow data contains the form fields, error messages and csrf token
     try {
       const { data: flow } = await kratos.getLoginFlow({ id: flowId });
-      return setLoginFlow(flow);
+      setLoginFlow(flow);
+      return flow;
     } catch (err) {
-      console.error(err);
+      logger.error("{err}", { err });
     }
   }, []);
 
   const createFlow = async () => {
-    console.log("createFlow");
+    logger.info("createFlow");
 
     try {
       const { data: flow } = await kratos.createBrowserLoginFlow({
@@ -101,33 +102,13 @@ function LoginForm() {
       });
 
       setLoginFlow(flow);
-      console.log("created flow", flow);
+      logger.info("created flow {flow}", { flow });
 
       navigate({ to: "/login", search: () => ({ flow: flow.id }) });
     } catch (error) {
-      console.error(error);
+      logger.error("{error}", { error });
     }
   };
-
-  // submit the login form data to Ory
-  // const submitFlow = async (body: UpdateLoginFlowBody) => {
-  //   console.log("submitFlow", body);
-  //   if (!loginFlow) return navigate({ to: "/login", replace: true });
-
-  //   try {
-  //     await kratos.updateLoginFlow({
-  //       flow: loginFlow.id,
-  //       updateLoginFlowBody: body,
-  //     });
-  //     console.log("flow updated");
-
-  //     await router.invalidate();
-
-  //     navigate({ to: "/profile", replace: true });
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
 
   useEffect(() => {
     // check if the login flow is for two factor authentication

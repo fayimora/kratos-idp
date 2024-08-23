@@ -37,7 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setSession(login.session);
       setIsAuthenticated(!!login.session.active);
     } catch (error) {
-      // logger.error(error);
+      logger.error("{error}", { error });
     }
   };
 

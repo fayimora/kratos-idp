@@ -6,6 +6,7 @@ import {
   UiNode,
   UiNodeInputAttributes,
 } from "@ory/client";
+import { getLogger } from "@logtape/logtape";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -37,3 +38,6 @@ export function getInputAttributeValue(
   )?.attributes as UiNodeInputAttributes;
   return nodeAttributes.value as string;
 }
+
+export const getRouteLogger = (route: string) =>
+  getLogger(["kratos-idp-frontend", "routes", route]);
