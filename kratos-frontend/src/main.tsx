@@ -23,6 +23,7 @@ await configure({
   sinks: { console: getConsoleSink() },
   filters: {},
   loggers: [
+    { category: ["logtape", "meta"], level: "error", sinks: ["console"] },
     { category: "kratos-idp-frontend", level: "info", sinks: ["console"] },
   ],
 });
