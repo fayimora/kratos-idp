@@ -31,7 +31,6 @@ export const Route = createFileRoute("/_secured/profile")({
 
 function Profile() {
   const [flow, setFlow] = useState<SettingsFlow | null>(null);
-  const [settings, setSettings] = useState<SettingsFlow | null>(null);
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
 
@@ -56,7 +55,6 @@ function Profile() {
       };
 
       await submitFlow(req);
-      console.log(value);
     },
   });
 
@@ -95,9 +93,9 @@ function Profile() {
         flow: flow.id,
         updateSettingsFlowBody: body,
       });
-      setSettings(settings);
+      setFlow(settings);
 
-      console.log("flow updated");
+      console.log("flow updated", flow);
 
       navigate({ replace: true });
     } catch (error) {
@@ -119,7 +117,7 @@ function Profile() {
       <CardHeader>
         <CardTitle className="text-xl">Profile</CardTitle>
         <CardDescription>Update your profile information</CardDescription>
-        {settings?.ui.messages?.map((m) => (
+        {flow?.ui.messages?.map((m) => (
           <Alert variant="default" key={m.id}>
             <AlertCircle className="h-4 w-4" />
             {/* <AlertTitle>Error</AlertTitle> */}
