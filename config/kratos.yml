@@ -46,6 +46,7 @@ selfservice:
       ui_url: http://127.0.0.1:5173/
     settings:
       ui_url: http://127.0.0.1:5173/profile
+      privileged_session_max_age: 10m
   methods:
     code:
       enabled: true
