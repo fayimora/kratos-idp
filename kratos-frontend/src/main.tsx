@@ -13,6 +13,8 @@ const router = createRouter({
     session: undefined!,
     client: undefined!,
     isAuthenticated: false,
+    login: () => Promise.resolve(),
+    logout: () => Promise.resolve(),
   },
   // defaultPreload: "intent"
 });
@@ -41,15 +43,17 @@ function App() {
 }
 
 function InnerApp() {
-  const auth = useAuth();
+  const { session, client, isAuthenticated, login, logout } = useAuth();
   return (
     <RouterProvider
       router={router}
       // defaultPreload="intent"
       context={{
-        session: auth.session,
-        client: auth.client,
-        isAuthenticated: false,
+        session: session,
+        client: client,
+        isAuthenticated: isAuthenticated,
+        login: login,
+        logout: logout,
       }}
     />
   );
