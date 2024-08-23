@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@logtape/logtape": "^0.4.3",
     "@ory/client": "^1.14.3",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slot": "^1.1.0",
@@ -40,6 +41,7 @@
     "tailwindcss": "^3.4.10",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.1"
+    "vite": "^5.4.1",
+    "vite-plugin-top-level-await": "^1.4.4"
   }
 }

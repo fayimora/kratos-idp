@@ -5,7 +5,7 @@ import { routeTree } from "./routeTree.gen";
 import ReactDOM from "react-dom/client";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { AuthProvider, useAuth } from "./lib/auth";
-import { UpdateLoginFlowBody } from "@ory/client";
+import { configure, getConsoleSink } from "@logtape/logtape";
 
 const router = createRouter({
   routeTree,
@@ -15,6 +15,14 @@ const router = createRouter({
     isAuthenticated: false,
   },
   // defaultPreload: "intent"
+});
+
+await configure({
+  sinks: { console: getConsoleSink() },
+  filters: {},
+  loggers: [
+    { category: "kratos-idp-frontend", level: "info", sinks: ["console"] },
+  ],
 });
 
 // Register the router instance for type safety

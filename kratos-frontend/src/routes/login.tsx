@@ -23,6 +23,9 @@ import {
   KratosFlowSearchParams,
 } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
+import { getLogger } from "@logtape/logtape";
+
+const logger = getLogger(["kratos-idp-frontend", "auth"]);
 
 export const Route = createFileRoute("/login")({
   component: () => <LoginForm />,
@@ -32,7 +35,7 @@ export const Route = createFileRoute("/login")({
     };
   },
   beforeLoad: ({ context, location }) => {
-    console.log("login before load", context);
+    logger.info("login context before load {context}", { context });
     if (context.session?.active) {
       throw redirect({
         to: "/profile",
@@ -74,7 +77,7 @@ function LoginForm() {
 
   // Get the flow based on the flowId in the URL (.e.g redirect to this page after flow initialized)
   const getFlow = useCallback(async (flowId: string) => {
-    console.log("getFlow", flowId);
+    logger.debug("getFlow for {flowId}", { flowId });
 
     // the flow data contains the form fields, error messages and csrf token
     try {

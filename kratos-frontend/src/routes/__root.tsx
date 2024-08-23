@@ -7,6 +7,9 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { useEffect, useState } from "react";
 import { AuthContext, useAuth } from "@/lib/auth";
+import { getLogger } from "@logtape/logtape";
+
+const logger = getLogger(["kratos-idp-frontend", "routes", "root"]);
 
 export const Route = createRootRouteWithContext<AuthContext>()({
   component: () => <Root />,
@@ -19,10 +22,10 @@ function Root() {
   const createLogoutFlow = async () => {
     try {
       const { data: flow } = await kratos.createBrowserLogoutFlow();
-      console.log("logout flow", flow);
+      logger.info(`logout flow ${flow}`);
       setLogoutUrl(flow.logout_url);
     } catch (error) {
-      console.error(error);
+      console.error(logger.error);
     }
   };
 

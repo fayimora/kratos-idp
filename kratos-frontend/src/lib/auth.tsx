@@ -1,6 +1,9 @@
+import { getLogger } from "@logtape/logtape";
 import { kratos } from "./utils";
 import { Session, UpdateLoginFlowBody } from "@ory/client";
 import { createContext, useContext, useEffect, useState } from "react";
+
+const logger = getLogger(["kratos-idp-frontend", "auth"]);
 
 export interface AuthContext {
   session: Session | null;
@@ -34,7 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setSession(login.session);
       setIsAuthenticated(!!login.session.active);
     } catch (error) {
-      console.error(error);
+      // logger.error(error);
     }
   };
 
