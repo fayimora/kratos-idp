@@ -21,7 +21,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
 export const Route = createFileRoute("/_secured/profile")({
-  component: () => <Profile />,
+  component: () => <ProfileUpdate />,
   validateSearch: (search: Record<string, unknown>): KratosFlowSearchParams => {
     return {
       flow: (search.flow as string) || "",
@@ -29,7 +29,141 @@ export const Route = createFileRoute("/_secured/profile")({
   },
 });
 
-function Profile() {
+function ProfileUpdate() {
+  return (
+    <>
+      <ProfileForm />
+      <PasswordUpdateForm />
+    </>
+  );
+}
+
+function PasswordUpdateForm() {
+  const [flow, setFlow] = useState<SettingsFlow | null>(null);
+  const searchParams = Route.useSearch();
+  const navigate = Route.useNavigate();
+
+  const form = useForm({
+    defaultValues: {
+      password: "",
+    },
+    onSubmit: async ({ value }) => {
+      const csrf_token = getInputAttributeValue(flow!.ui.nodes, "csrf_token");
+      const req: UpdateSettingsFlowBody = {
+        method: "password",
+        password: value.password,
+        csrf_token: csrf_token,
+      };
+
+      await submitFlow(req);
+    },
+  });
+
+  const getFlow = useCallback(async (flowId: string) => {
+    console.log("getFlow", flowId);
+
+    // the flow data contains the form fields, error messages and csrf token
+    try {
+      const { data: flow } = await kratos.getSettingsFlow({ id: flowId });
+      setFlow(flow);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  const createFlow = async () => {
+    console.log("createFlow");
+
+    try {
+      const { data: flow } = await kratos.createBrowserSettingsFlow();
+
+      setFlow(flow);
+      console.log("created flow", flow);
+
+      navigate({ to: "/profile", search: () => ({ flow: flow.id }) });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const submitFlow = async (body: UpdateSettingsFlowBody) => {
+    console.log("submitFlow", body);
+    if (!flow) return navigate({ replace: true });
+    try {
+      const { data: settings } = await kratos.updateSettingsFlow({
+        flow: flow.id,
+        updateSettingsFlowBody: body,
+      });
+      setFlow(settings);
+
+      console.log("flow updated", flow);
+
+      navigate({ replace: true });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    const flowId = searchParams.flow;
+    if (flowId && flowId !== "") {
+      getFlow(flowId).catch(() => createFlow()); // if for some reason the flow has expired, we need to get a new one
+      return;
+    }
+    createFlow();
+  }, []);
+
+  return (
+    <Card className="mx-auto max-w-sm">
+      <CardHeader>
+        <CardTitle className="text-xl">Update Password</CardTitle>
+        <CardDescription>Change your password</CardDescription>
+        {flow?.ui.messages?.map((m) => (
+          <Alert variant="default" key={m.id}>
+            <AlertCircle className="h-4 w-4" />
+            {/* <AlertTitle>Error</AlertTitle> */}
+            <AlertDescription>{m.text}</AlertDescription>
+          </Alert>
+        ))}
+      </CardHeader>
+      <CardContent>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+        >
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <form.Field
+                name="password"
+                children={(field) => (
+                  <>
+                    <Label htmlFor="first-name">Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      name={field.password}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+                  </>
+                )}
+              />
+            </div>
+            <Button type="submit" className="w-full">
+              Update
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ProfileForm() {
   const [flow, setFlow] = useState<SettingsFlow | null>(null);
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();

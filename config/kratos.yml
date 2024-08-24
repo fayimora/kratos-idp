@@ -47,6 +47,10 @@ selfservice:
     settings:
       ui_url: http://127.0.0.1:5173/profile
       privileged_session_max_age: 10m
+      after:
+        password:
+          hooks:
+            - hook: revoke_active_sessions
   methods:
     code:
       enabled: true
