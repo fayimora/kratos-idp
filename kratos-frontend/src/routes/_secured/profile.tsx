@@ -17,7 +17,7 @@ import {
   kratos,
   KratosFlowSearchParams,
 } from "@/lib/utils";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
 export const Route = createFileRoute("/_secured/profile")({
@@ -30,34 +30,8 @@ export const Route = createFileRoute("/_secured/profile")({
 });
 
 function ProfileUpdate() {
-  return (
-    <>
-      <ProfileForm />
-      <PasswordUpdateForm />
-    </>
-  );
-}
-
-function PasswordUpdateForm() {
   const [flow, setFlow] = useState<SettingsFlow | null>(null);
-  const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
-
-  const form = useForm({
-    defaultValues: {
-      password: "",
-    },
-    onSubmit: async ({ value }) => {
-      const csrf_token = getInputAttributeValue(flow!.ui.nodes, "csrf_token");
-      const req: UpdateSettingsFlowBody = {
-        method: "password",
-        password: value.password,
-        csrf_token: csrf_token,
-      };
-
-      await submitFlow(req);
-    },
-  });
 
   const getFlow = useCallback(async (flowId: string) => {
     console.log("getFlow", flowId);
@@ -66,6 +40,7 @@ function PasswordUpdateForm() {
     try {
       const { data: flow } = await kratos.getSettingsFlow({ id: flowId });
       setFlow(flow);
+      return flow;
     } catch (err) {
       console.error(err);
     }
@@ -103,6 +78,53 @@ function PasswordUpdateForm() {
       console.error(error);
     }
   };
+
+  return (
+    <>
+      <PersonalDetailsForm
+        flow={flow}
+        getFlow={getFlow}
+        createFlow={createFlow}
+        submitFlow={submitFlow}
+      />
+      <PasswordUpdateForm
+        flow={flow}
+        getFlow={getFlow}
+        createFlow={createFlow}
+        submitFlow={submitFlow}
+      />
+    </>
+  );
+}
+
+function PasswordUpdateForm({
+  flow,
+  getFlow,
+  createFlow,
+  submitFlow,
+}: {
+  flow: SettingsFlow | null;
+  getFlow: (flowId: string) => Promise<SettingsFlow | undefined>;
+  createFlow: () => Promise<void>;
+  submitFlow: (body: UpdateSettingsFlowBody) => Promise<void>;
+}) {
+  const searchParams = Route.useSearch();
+
+  const form = useForm({
+    defaultValues: {
+      password: "",
+    },
+    onSubmit: async ({ value }) => {
+      const csrf_token = getInputAttributeValue(flow!.ui.nodes, "csrf_token");
+      const req: UpdateSettingsFlowBody = {
+        method: "password",
+        password: value.password,
+        csrf_token: csrf_token,
+      };
+
+      await submitFlow(req);
+    },
+  });
 
   useEffect(() => {
     const flowId = searchParams.flow;
@@ -140,7 +162,7 @@ function PasswordUpdateForm() {
                 name="password"
                 children={(field) => (
                   <>
-                    <Label htmlFor="first-name">Password</Label>
+                    <Label htmlFor="password">Password</Label>
                     <Input
                       id="password"
                       type="password"
@@ -154,7 +176,7 @@ function PasswordUpdateForm() {
               />
             </div>
             <Button type="submit" className="w-full">
-              Update
+              Update Password
             </Button>
           </div>
         </form>
@@ -163,10 +185,18 @@ function PasswordUpdateForm() {
   );
 }
 
-function ProfileForm() {
-  const [flow, setFlow] = useState<SettingsFlow | null>(null);
+function PersonalDetailsForm({
+  flow,
+  getFlow,
+  createFlow,
+  submitFlow,
+}: {
+  flow: SettingsFlow | null;
+  getFlow: (flowId: string) => Promise<SettingsFlow | undefined>;
+  createFlow: () => Promise<void>;
+  submitFlow: (body: UpdateSettingsFlowBody) => Promise<void>;
+}) {
   const searchParams = Route.useSearch();
-  const navigate = Route.useNavigate();
 
   const form = useForm({
     defaultValues: {
@@ -191,51 +221,6 @@ function ProfileForm() {
       await submitFlow(req);
     },
   });
-
-  const getFlow = useCallback(async (flowId: string) => {
-    console.log("getFlow", flowId);
-
-    // the flow data contains the form fields, error messages and csrf token
-    try {
-      const { data: flow } = await kratos.getSettingsFlow({ id: flowId });
-      setFlow(flow);
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
-
-  const createFlow = async () => {
-    console.log("createFlow");
-
-    try {
-      const { data: flow } = await kratos.createBrowserSettingsFlow();
-
-      setFlow(flow);
-      console.log("created flow", flow);
-
-      navigate({ to: "/profile", search: () => ({ flow: flow.id }) });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const submitFlow = async (body: UpdateSettingsFlowBody) => {
-    console.log("submitFlow", body);
-    if (!flow) return navigate({ replace: true });
-    try {
-      const { data: settings } = await kratos.updateSettingsFlow({
-        flow: flow.id,
-        updateSettingsFlowBody: body,
-      });
-      setFlow(settings);
-
-      console.log("flow updated", flow);
-
-      navigate({ replace: true });
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   useEffect(() => {
     const flowId = searchParams.flow;
