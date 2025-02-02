@@ -114,14 +114,93 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
-export const routeTree = rootRoute.addChildren({
-  IndexRoute,
-  SecuredRoute: SecuredRoute.addChildren({ SecuredProfileRoute }),
-  LoginRoute,
-  RecoveryRoute,
-  RegisterRoute,
-  VerifyRoute,
-})
+interface SecuredRouteChildren {
+  SecuredProfileRoute: typeof SecuredProfileRoute
+}
+
+const SecuredRouteChildren: SecuredRouteChildren = {
+  SecuredProfileRoute: SecuredProfileRoute,
+}
+
+const SecuredRouteWithChildren =
+  SecuredRoute._addFileChildren(SecuredRouteChildren)
+
+export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '': typeof SecuredRouteWithChildren
+  '/login': typeof LoginRoute
+  '/recovery': typeof RecoveryRoute
+  '/register': typeof RegisterRoute
+  '/verify': typeof VerifyRoute
+  '/profile': typeof SecuredProfileRoute
+}
+
+export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '': typeof SecuredRouteWithChildren
+  '/login': typeof LoginRoute
+  '/recovery': typeof RecoveryRoute
+  '/register': typeof RegisterRoute
+  '/verify': typeof VerifyRoute
+  '/profile': typeof SecuredProfileRoute
+}
+
+export interface FileRoutesById {
+  __root__: typeof rootRoute
+  '/': typeof IndexRoute
+  '/_secured': typeof SecuredRouteWithChildren
+  '/login': typeof LoginRoute
+  '/recovery': typeof RecoveryRoute
+  '/register': typeof RegisterRoute
+  '/verify': typeof VerifyRoute
+  '/_secured/profile': typeof SecuredProfileRoute
+}
+
+export interface FileRouteTypes {
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/'
+    | ''
+    | '/login'
+    | '/recovery'
+    | '/register'
+    | '/verify'
+    | '/profile'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/' | '' | '/login' | '/recovery' | '/register' | '/verify' | '/profile'
+  id:
+    | '__root__'
+    | '/'
+    | '/_secured'
+    | '/login'
+    | '/recovery'
+    | '/register'
+    | '/verify'
+    | '/_secured/profile'
+  fileRoutesById: FileRoutesById
+}
+
+export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  SecuredRoute: typeof SecuredRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  RecoveryRoute: typeof RecoveryRoute
+  RegisterRoute: typeof RegisterRoute
+  VerifyRoute: typeof VerifyRoute
+}
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  SecuredRoute: SecuredRouteWithChildren,
+  LoginRoute: LoginRoute,
+  RecoveryRoute: RecoveryRoute,
+  RegisterRoute: RegisterRoute,
+  VerifyRoute: VerifyRoute,
+}
+
+export const routeTree = rootRoute
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
 
 /* prettier-ignore-end */
 
