@@ -1,14 +1,13 @@
-version: "3.7"
 services:
   kratos-migrate:
-    image: oryd/kratos:v1.2.0
+    image: oryd/kratos:v1.3.0
     environment:
       - DSN=postgres://kratos:secret@postgresd:5432/kratos?sslmode=disable&max_conns=20&max_idle_conns=4
     volumes:
       - type: bind
         source: ./config
         target: /etc/config/kratos
-    command: -c /etc/config/kratos/kratos.yml migrate sql -e --yes
+    command: migrate sql -e --yes
     restart: on-failure
     labels:
       logging: "promtail"
@@ -28,9 +27,10 @@ services:
     networks:
       - intranet
   kratos:
+    container_name: kratos
     depends_on:
       - kratos-migrate
-    image: oryd/kratos:v1.2.0
+    image: oryd/kratos:v1.3.0
     ports:
       - "4433:4433" # public
       - "4434:4434" # admin

@@ -1,4 +1,4 @@
-FROM oryd/kratos:v1.2.0
+FROM oryd/kratos:v1.3.0
 
 ARG KRATOS_CONFIG_PATH
 
