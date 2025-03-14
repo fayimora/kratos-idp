@@ -1,11 +1,9 @@
-import { kratos } from "@/lib/utils";
 import {
   createRootRouteWithContext,
   Link,
   Outlet,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import { useEffect, useState } from "react";
 import { AuthContext, useAuth } from "@/lib/auth";
 import { getLogger } from "@logtape/logtape";
 
@@ -16,24 +14,7 @@ export const Route = createRootRouteWithContext<AuthContext>()({
 });
 
 function Root() {
-  const [logoutUrl, setLogoutUrl] = useState<string>();
-  const { session } = useAuth();
-
-  const createLogoutFlow = async () => {
-    try {
-      const { data: flow } = await kratos.createBrowserLogoutFlow();
-      logger.info(`logout flow ${flow}`);
-      setLogoutUrl(flow.logout_url);
-    } catch (error) {
-      console.error(logger.error);
-    }
-  };
-
-  useEffect(() => {
-    if (session?.active) {
-      createLogoutFlow();
-    }
-  }, [session]);
+  const { session, logout } = useAuth();
 
   return (
     <>
@@ -42,7 +23,7 @@ function Root() {
           Home
         </Link>{" "}
         {session ? (
-          <Link to={logoutUrl} replace={true}>
+          <Link to="" onClick={() => logout()} replace={true}>
             {" "}
             Sign Out{" "}
           </Link>

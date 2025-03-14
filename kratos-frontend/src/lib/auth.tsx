@@ -41,9 +41,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  function logout(): Promise<void> {
-    throw new Error("Function not implemented.");
-  }
+  const logout = async () => {
+    try {
+      const { data: flow } = await kratos.createBrowserLogoutFlow();
+      logger.info(`logout flow ${flow}`);
+      // force browser to redirect to the logout url
+      window.location.href = flow.logout_url;
+    } catch (error) {
+      console.error(logger.error);
+    }
+  };
 
   return (
     <AuthContext.Provider
