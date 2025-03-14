@@ -3,11 +3,8 @@ import {
   Link,
   Outlet,
 } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { AuthContext, useAuth } from "@/lib/auth";
-import { getLogger } from "@logtape/logtape";
-
-const logger = getLogger(["kratos-idp-frontend", "routes", "root"]);
 
 export const Route = createRootRouteWithContext<AuthContext>()({
   component: () => <Root />,

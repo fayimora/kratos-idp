@@ -13,7 +13,6 @@ import { useForm } from "@tanstack/react-form";
 import {
   VerificationFlow,
   UpdateVerificationFlowBody,
-  UiNodeInputAttributes,
   LoginFlowState,
 } from "@ory/client";
 import { useCallback, useEffect, useState } from "react";

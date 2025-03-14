@@ -11,11 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
 import { useCallback, useEffect, useState } from "react";
-import {
-  RegistrationFlow,
-  SuccessfulNativeRegistration,
-  UpdateRegistrationFlowBody,
-} from "@ory/client";
+import { RegistrationFlow, UpdateRegistrationFlowBody } from "@ory/client";
 import {
   getInputAttributeValue,
   kratos,
@@ -108,9 +104,9 @@ function SignUpForm() {
         updateRegistrationFlowBody: body,
       });
       console.log("flow updated", registration);
-      const verificationFlow = registration.continue_with.find(
+      const verificationFlow = registration.continue_with?.find(
         (c) => c.action === "show_verification_ui",
-      ).flow;
+      )?.flow;
       console.log("verificationFlow", verificationFlow);
 
       if (verificationFlow) {

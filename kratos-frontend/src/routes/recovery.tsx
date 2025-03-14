@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Card,
   CardContent,
@@ -11,11 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
 import { getInputAttributeValue, KratosFlowSearchParams } from "@/lib/utils";
-import {
-  RecoveryFlow,
-  UpdateRecoveryFlowBody,
-  UpdateRecoveryFlowWithCodeMethod,
-} from "@ory/client";
+import { RecoveryFlow, UpdateRecoveryFlowBody } from "@ory/client";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 
@@ -259,4 +255,3 @@ function VerifyCodeForm() {
     </Card>
   );
 }
-

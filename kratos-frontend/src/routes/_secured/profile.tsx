@@ -166,7 +166,7 @@ function PasswordUpdateForm({
                     <Input
                       id="password"
                       type="password"
-                      name={field.password}
+                      name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}

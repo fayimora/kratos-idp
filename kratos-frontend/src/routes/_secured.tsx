@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_secured")({
-  beforeLoad: ({ context, location }) => {
+  beforeLoad: ({ context }) => {
     console.log("auth index context", context);
     if (!context.session?.active) {
       console.log("redirecting to login");

@@ -39,6 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (error) {
       logger.error("{error}", { error });
     }
+    return Promise.resolve();
   };
 
   const logout = async () => {

@@ -34,7 +34,7 @@ export const Route = createFileRoute("/login")({
       flow: (search.flow as string) || "",
     };
   },
-  beforeLoad: ({ context, location }) => {
+  beforeLoad: ({ context }) => {
     logger.info("login context before load {context}", { context });
     if (context.session?.active) {
       throw redirect({
